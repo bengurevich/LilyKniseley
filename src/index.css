@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+/* Set default fonts */
+body {
+  font-family: 'Azeret Mono', 'Inconsolata', monospace;
+  background-color: #fffff6;
+}
+
+/* You can also set different fonts for specific elements if needed */
+.font-azeret {
+  font-family: 'Azeret Mono', monospace;
+}
+
+.font-inconsolata {
+  font-family: 'Inconsolata', monospace;
+}

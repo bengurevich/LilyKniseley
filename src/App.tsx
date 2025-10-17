@@ -1,25 +1,89 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DarkLogo from "./assets/DarkLogo.png";
 import KTPSplash from "./assets/KTP_spash-01.png";
 import Lily from "./assets/lily.jpeg";
 import Splish from "./assets/SplishSplash_BACKcover.jpg";
 import RTSSplashScreen from "./assets/RTS_SplashScreen.jpg";
-import MHHS from "./assets/MHHS_media-22.png"
-
+import MHHS from "./assets/MHHS_media-22.png";
+import StickerMEEE from "./assets/StickerMEEE.png";
+import StickerMe2 from "./assets/StickerME2.png";
+import StickerME3 from "./assets/StickerME3.png";
+import TiltedCard from './tiltedCard';
+import AboutMe from './AboutMe';
+import Play from './Play';
+import CircularText from './circularText';
+import NavBar from './navBar';
+import TextType from './typedText';
 export default function App() {
   const projects = [
-    { id: 1, title: "", image: KTPSplash, description: "UI/UX · Illustration · Motion", subtitle: "an interactive website gamifying climate change", year: "2023" },
-    { id: 2, title: "", image: RTSSplashScreen, description: "Web Design · Development", subtitle: "real-time strategy game interface", year: "2024" },
-    { id: 3, title: "", image: Splish, description: "UI/UX · Game Design", subtitle: "engaging splash screen experience", year: "2024" },
-    { id: 4, title: "", image: MHHS, description: "Web Design · Branding", subtitle: "personal portfolio showcase", year: "2025" },
-    { id: 5, title: "", image: Lily, description: "Web Design · Branding", subtitle: "personal portfolio showcase", year: "2025" }
+    { id: 1, title: "", image: KTPSplash, description: "UI/UX · Illustration · Motion", subtitle: "An interactive website gamifying climate change", year: "2023", name: "Kill The Planet" },
+    { id: 2, title: "", image: RTSSplashScreen, description: "UI/UX · Illustration · Branding", subtitle: "An experimental arcade game merging digital play and physical interaction", year: "2024-2025", name: "Ruin the Show" },
+    { id: 3, title: "", image: Splish, description: "3D · Illustration · Motion ", subtitle: "Spotify DJ album branding and visual design", year: "2025", name: "FREELANCE" },
+    { id: 4, title: "", image: MHHS, description: "Leadership · Print Production · Motion Graphics", subtitle: "Guided creative projects while designing printed branding materials", year: "2024-2025", name: "MISSION HILLS HIGH SCHOOL" },
+    { id: 5, title: "", image: Lily, description: "3D · Fashion Design · Motion Interaction ", subtitle: "Created an immersive exhibit and 8-piece sustainable collection for RIT’s fashion showcase.", year: "2023-2025", name: "Beyond Fashion" }
   ];
 
   const [currentCenterIndex, setCurrentCenterIndex] = useState(0);
+  const [currentPage, setCurrentPage] = useState<'work' | 'play' | 'about'>('work');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Auto-hide loading screen with smooth transition
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsTransitioning(true);
+      // Wait for fade animation to complete before hiding
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 2000); // 800ms fade duration
+    }, 12000); // 12 seconds before starting transition
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleProjectClick = (clickedIndex: React.SetStateAction<number>) => {
     setCurrentCenterIndex(clickedIndex);
   };
+
+  const handleShowPlay = () => {
+    setCurrentPage('play');
+  };
+
+  const handleShowAboutMe = () => {
+    setCurrentPage('about');
+  };
+
+  const handleBackToWork = () => {
+    setCurrentPage('work');
+  };
+
+  const handleEnterSite = () => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000); // 2000ms fade duration
+  };
+
+  // Show different pages based on current page state
+  if (currentPage === 'play') {
+    return (
+      <div className="w-full h-screen flex flex-col text-neutral-900">
+        <NavBar 
+          currentPage={currentPage}
+          onShowWork={handleBackToWork}
+          onShowPlay={handleShowPlay}
+          onShowAbout={handleShowAboutMe}
+        />
+        <div className="flex-1">
+          <Play />
+        </div>
+      </div>
+    );
+  }
+
+  if (currentPage === 'about') {
+    return <AboutMe onBack={handleBackToWork} />;
+  }
 
   // Get the projects arranged for display
   const getArrangedProjects = () => {
@@ -50,25 +114,15 @@ export default function App() {
 
   return (
     <div className="w-full h-screen flex flex-col text-neutral-900">
-      {/* HEADER */}
-      <header className="flex items-center justify-between px-8 py-6">
-        <a
-          href="#"
-          className="inline-flex h-20 w-20 items-center justify-center"
-        >
-          <img src={DarkLogo} alt="LK Logo" className="h-50 w-50 object-contain" />
-        </a>
-        <nav className="flex gap-8 text-sm">
-          <a href="#work" className="hover:opacity-70">Work</a>
-          <a href="#play" className="hover:opacity-70">Play</a>
-          <a href="#about" className="hover:opacity-70">About</a>
-        </nav>
-      </header>
+      <NavBar 
+        currentPage={currentPage}
+        onShowWork={handleBackToWork}
+        onShowPlay={handleShowPlay}
+        onShowAbout={handleShowAboutMe}
+      />
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 flex flex-col justify-between px-8 pb-8">
-        {/* “My Work” label */}
-        <p className="text-xs mb-2 text-neutral-600">My Work</p>
+      <main className="flex-1 flex flex-col justify-between pb-8 -mt-4">
 
         {/* CENTER SECTION */}
         <div className="relative flex-1 flex items-center justify-center">
@@ -82,90 +136,137 @@ export default function App() {
             {/* Left side projects */}
             <div className="flex items-center gap-8 mr-12">
               {sideProjects.filter(p => p.position === 'left').map((project) => (
-                <ProjectSplash 
-                  key={project.id} 
-                  title={project.title} 
-                  image={project.image}
+                <TiltedCard
+                  key={project.id}
+                  imageSrc={project.image}
+                  altText={project.subtitle}
+                  captionText={project.title}
+                  containerHeight="250px"
+                  containerWidth="250px"
+                  imageHeight="250px"
+                  imageWidth="250px"
+                  rotateAmplitude={1}
+                  scaleOnHover={1.1}
+                  showMobileWarning={false}
+                  showTooltip={false}
+                  displayOverlayContent={true}
                   onClick={() => handleProjectClick(project.originalIndex)}
+                  overlayContent={
+                    <div className="absolute inset-0 rounded flex items-center justify-center">
+                      <span className="font-semibold text-center px-2 text-base text-white">{project.title}</span>
+                    </div>
+                  }
                 />
               ))}
             </div>
 
             {/* Center hero project */}
-            <div 
-              key={centerProject.id} 
-              className="w-[650px] h-[650px] border border-neutral-300 flex items-center justify-center text-5xl font-bold shadow-2xl bg-cover bg-center relative rounded" 
-              style={{ backgroundImage: `url(${centerProject.image})` }}
-            >
-              <div className="absolute inset-0 rounded flex items-center justify-center">
-                <span className="text-white text-center">{centerProject.title}</span>
-              </div>
-            </div>
+            <TiltedCard
+              imageSrc={centerProject.image}
+              altText={centerProject.subtitle}
+              captionText={centerProject.title}
+              containerHeight="450px"
+              containerWidth="450px"
+              imageHeight="450px"
+              imageWidth="450px"
+              rotateAmplitude={.1}
+              scaleOnHover={1.1}
+              showMobileWarning={false}
+              showTooltip={true}
+              displayOverlayContent={true}
+              overlayContent={
+                <div className="absolute inset-0 rounded flex items-center justify-center">
+                  <span className="text-white text-center text-5xl font-bold">{centerProject.title}</span>
+                </div>
+              }
+            />
 
             {/* Right side projects */}
             <div className="flex items-center gap-8 ml-12">
               {sideProjects.filter(p => p.position === 'right').map((project) => (
-                <ProjectSplash 
-                  key={project.id} 
-                  title={project.title} 
-                  image={project.image}
+                <TiltedCard
+                  key={project.id}
+                  imageSrc={project.image}
+                  altText={project.subtitle}
+                  captionText={project.title}
+                  containerHeight="250px"
+                  containerWidth="250px"
+                  imageHeight="250px"
+                  imageWidth="250px"
+                  rotateAmplitude={.3}
+                  scaleOnHover={1.09}
+                  showMobileWarning={false}
+                  showTooltip={false}
+                  displayOverlayContent={true}
                   onClick={() => handleProjectClick(project.originalIndex)}
+                  overlayContent={
+                    <div className="absolute inset-0 rounded flex items-center justify-center">
+                      <span className="font-semibold text-center px-2 text-base text-white">{project.title}</span>
+                    </div>
+                  }
                 />
               ))}
             </div>
           </div>
-        </div>
 
-        {/* FOOTER SECTION */}
-        <div className="flex justify-between items-end">
-          {/* Left side */}
-          <div>
-            <p className="text-sm">
-              Hi I’m Lily... <span className="text-neutral-500">a designer</span>
-              <br />
-              who believes that anything imagined can be created
-            </p>
-            <div className="flex gap-3 mt-3">
-              <button className="border border-neutral-300 bg-white px-3 py-1.5 text-xs font-semibold hover:-translate-y-0.5 transition rounded-md shadow-sm">
-                RESUME
-              </button>
-              <button className="border border-neutral-300 bg-white px-3 py-1.5 text-xs font-semibold hover:-translate-y-0.5 transition rounded-md shadow-sm">
-                ABOUT ME
-              </button>
+         
+         
+          {/* Sticker with hover text bubble */}
+          <div className="absolute left-8 top-1/2 translate-y-[275px] group">
+            <div className="relative">
+              {/* Default sticker */}
+              <img 
+                src={StickerMEEE} 
+                alt="Sticker" 
+                className="w-30 h-30 object-contain cursor-pointer group-hover:opacity-0"
+              />
+              {/* Hover sticker */}
+              <img 
+                src={StickerMe2} 
+                alt="Sticker Hover" 
+                className="absolute top-0 left-0 w-30 h-30 object-contain cursor-pointer  opacity-0 group-hover:opacity-100"
+              />
+              {/* Text bubble that appears on hover */}
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">
+                Hey there! 👋
+                {/* Arrow pointing down */}
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
+              </div>
+            </div>
+          </div>          {/* Project details positioned under the center card, aligned with its right edge */}
+          <div className="absolute left-1/2 translate-x-[225px] top-1/2 translate-y-[275px]">
+            <div className="flex flex-col space-y-2 w-120">
+              <p className="uppercase text-xs text-neutral-500 -mt-2">{centerProject.year}</p>
+              <p className="uppercase text-2xl font-semibold text-black">{centerProject.name}</p>
+              <p className="text-xs whitespace-nowrap -mt-2">{centerProject.description}</p>
+              <p className="text-s text-black">
+                {centerProject.subtitle}
+              </p>
             </div>
           </div>
+        </div>
 
-          {/* Right side */}
-          <div className="text-right text-sm">
-            <p className="uppercase text-xs text-neutral-500">Project Description</p>
-            <p className="font-semibold">{centerProject.description}</p>
-            <p className="text-neutral-700">
-              {centerProject.subtitle}
-            </p>
-            <p className="mt-1 text-neutral-500">{centerProject.year}</p>
+      
+
+      </main>
+      
+
+      {/* Loading Screen Overlay - COMMENTED OUT FOR TESTING */}
+      {/* {isLoading && (
+        <div className={`fixed inset-0 z-50 flex items-center justify-center bg-white transition-opacity duration-700 ease-in-out ${
+          isTransitioning ? 'opacity-0' : 'opacity-100'
+        }`}>
+          <div className="text-center">
+            <TextType 
+              text={["Hi, I'm Lily!", "A passionate designer.", "Welcome to my portfolio.", ""]}
+              typingSpeed={75}
+              pauseDuration={1500}
+              showCursor={true}
+              cursorCharacter="|"
+            />
           </div>
         </div>
-      </main>
-    </div>
-  );
-}
-
-type ProjectSplashProps = {
-  title: string;
-  image: string;
-  onClick: () => void;
-};
-
-function ProjectSplash({ title, image, onClick }: ProjectSplashProps) {
-  return (
-    <div 
-      className="w-64 h-64 border border-neutral-300 flex items-center justify-center text-base font-medium text-white rounded bg-cover bg-center relative cursor-pointer hover:scale-105 transition-transform shadow-2xl hover:shadow-xl"
-      style={{ backgroundImage: `url(${image})` }}
-      onClick={onClick}
-    >
-      <div className="absolute inset-0 rounded flex items-center justify-center">
-        <span className="font-semibold text-center px-2">{title}</span>
-      </div>
+      )} */}
     </div>
   );
 }
